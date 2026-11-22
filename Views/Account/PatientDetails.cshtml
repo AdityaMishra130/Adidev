@@ -1,0 +1,169 @@
+@model CsharpProject.Models.AppUser
+@{
+    ViewData["Title"] = $"Patient: {Model.DisplayName}";
+    var appointments = ViewBag.Appointments as List<CsharpProject.Models.Appointment> ?? new();
+    var records = ViewBag.Records as List<CsharpProject.Models.MedicalRecord> ?? new();
+    var documents = ViewBag.Documents as List<CsharpProject.Models.MedicalDocument> ?? new();
+}
+
+<div class="mb-4">
+    <a asp-action="Patients" class="btn btn-sm btn-outline-secondary mb-3">
+        <i class="bi bi-arrow-left me-1"></i> Back to Patient Directory
+    </a>
+
+    <!-- Patient Header Card -->
+    <div class="adidev-card p-4 shadow-sm mb-4">
+        <div class="row align-items-center gy-3">
+            <div class="col-md-8 d-flex align-items-center gap-3">
+                <div class="avatar-badge" style="width: 64px; height: 64px; font-size: 1.6rem;">
+                    @Model.DisplayName.Substring(0, 1).ToUpperInvariant()
+                </div>
+                <div>
+                    <h3 class="fw-bold text-dark m-0">@Model.DisplayName</h3>
+                    <div class="d-flex flex-wrap gap-2 align-items-center mt-1">
+                        <span class="badge bg-primary bg-opacity-10 text-primary">Patient ID: #@Model.Id.Substring(0, 8)</span>
+                        @if (!string.IsNullOrEmpty(Model.BloodGroup))
+                        {
+                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">
+                                Blood: @Model.BloodGroup
+                            </span>
+                        }
+                        <span class="text-muted small"><i class="bi bi-envelope me-1"></i>@Model.Email</span>
+                        <span class="text-muted small"><i class="bi bi-telephone me-1"></i>@(Model.PhoneNumber ?? "N/A")</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a asp-controller="Documents" asp-action="Upload" asp-route-patientId="@Model.Id" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-upload me-1"></i> Upload Lab Report
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Grid -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="adidev-card p-4 h-100 shadow-sm">
+                <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                    <i class="bi bi-person-lines-fill text-primary me-2"></i> Demographics &amp; Emergency Info
+                </h6>
+                <div class="row g-2 small">
+                    <div class="col-5 text-muted">Gender:</div>
+                    <div class="col-7 fw-semibold">@(Model.Gender ?? "N/A")</div>
+                    <div class="col-5 text-muted">Date of Birth:</div>
+                    <div class="col-7 fw-semibold">@(Model.DateOfBirth?.ToString("dd MMM yyyy") ?? "N/A")</div>
+                    <div class="col-5 text-muted">Address:</div>
+                    <div class="col-7 fw-semibold">@(Model.Address ?? "N/A")</div>
+                    <div class="col-5 text-muted">Emergency Contact:</div>
+                    <div class="col-7 fw-semibold">@(Model.EmergencyContactName ?? "N/A") (@(Model.EmergencyContactPhone ?? "N/A"))</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="adidev-card p-4 h-100 shadow-sm">
+                <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                    <i class="bi bi-clipboard2-pulse text-danger me-2"></i> Clinical Alerts &amp; History
+                </h6>
+                <div class="mb-3">
+                    <label class="fw-bold small text-muted d-block">Known Allergies:</label>
+                    @if (!string.IsNullOrEmpty(Model.Allergies))
+                    {
+                        <span class="badge bg-warning bg-opacity-25 text-dark border border-warning fs-6">
+                            <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>@Model.Allergies
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="text-muted small">No recorded drug or food allergies.</span>
+                    }
+                </div>
+                <div>
+                    <label class="fw-bold small text-muted d-block">Chronic Conditions:</label>
+                    <p class="small text-secondary m-0">@(Model.ExistingConditions ?? "No documented chronic illnesses.")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Consultation Records Timeline -->
+    <div class="adidev-card p-4 shadow-sm mb-4">
+        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-journal-medical text-primary me-2"></i> Medical Consultations &amp; Prescriptions</h5>
+        @if (!records.Any())
+        {
+            <div class="text-center py-4 text-muted small">
+                <i class="bi bi-file-earmark-medical fs-2 d-block mb-2"></i>
+                No consultation notes recorded yet.
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-3">
+                @foreach (var rec in records)
+                {
+                    <div class="p-3 bg-light rounded-3 border">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <span class="fw-bold text-primary">Diagnosis: @rec.Diagnosis</span>
+                                <small class="text-muted ms-2">&bull; Consulted with Dr. @(rec.Doctor?.User?.DisplayName ?? rec.Appointment?.Doctor?.User?.DisplayName ?? "Specialist")</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <small class="text-muted">@rec.CreatedAtUtc.ToString("dd MMM yyyy")</small>
+                                <a asp-controller="Records" asp-action="Print" asp-route-id="@rec.Id" target="_blank" class="btn btn-sm btn-outline-secondary py-0">
+                                    <i class="bi bi-printer me-1"></i> Print Rx
+                                </a>
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(rec.BloodPressure) || !string.IsNullOrEmpty(rec.HeartRate))
+                        {
+                            <div class="mb-2 small text-muted">
+                                <strong>Vitals:</strong> BP: @rec.BloodPressure | Pulse: @rec.HeartRate | Temp: @rec.Temperature | SpO2: @rec.SpO2
+                            </div>
+                        }
+                        @if (rec.Prescriptions.Any())
+                        {
+                            <div class="small">
+                                <strong>Medicines:</strong>
+                                @string.Join(", ", rec.Prescriptions.Select(pr => $"{pr.Medication} ({pr.Dosage} - {pr.Frequency})"))
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Uploaded Documents -->
+    <div class="adidev-card p-4 shadow-sm">
+        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-folder2 text-success me-2"></i> Lab Reports &amp; Diagnostic Scans</h5>
+        @if (!documents.Any())
+        {
+            <div class="text-center py-4 text-muted small">
+                No lab reports or medical documents attached yet.
+            </div>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var doc in documents)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="p-3 border rounded-3 d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-file-earmark-pdf-fill fs-3 text-danger"></i>
+                                <div>
+                                    <div class="fw-semibold small text-truncate" style="max-width: 180px;">@doc.Title</div>
+                                    <small class="text-muted">@doc.DocumentType &bull; @doc.UploadedAtUtc.ToString("dd MMM yyyy")</small>
+                                </div>
+                            </div>
+                            <a asp-controller="Documents" asp-action="Download" asp-route-id="@doc.Id" class="btn btn-sm btn-outline-primary" target="_blank">
+                                <i class="bi bi-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

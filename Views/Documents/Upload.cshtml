@@ -1,0 +1,57 @@
+@model CsharpProject.Models.MedicalDocumentUploadViewModel
+@{
+    ViewData["Title"] = "Upload Medical Document";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-md-8 col-lg-6">
+        <div class="adidev-card p-4 p-md-5 shadow-sm">
+            <div class="text-center mb-4">
+                <div class="stat-icon stat-icon-primary mx-auto mb-3">
+                    <i class="bi bi-file-earmark-arrow-up-fill"></i>
+                </div>
+                <h4 class="fw-bold text-dark m-0">Upload Medical Document</h4>
+                <p class="text-muted small">Attach lab report, diagnostic scan, or discharge paper</p>
+            </div>
+
+            <form asp-action="Upload" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="PatientId" />
+                <input type="hidden" asp-for="MedicalRecordId" />
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label fw-semibold small text-secondary">Document Title <span class="text-danger">*</span></label>
+                    <input asp-for="Title" class="form-control" placeholder="e.g. Complete Blood Count (CBC) Report" />
+                    <span asp-validation-for="Title" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="DocumentType" class="form-label fw-semibold small text-secondary">Category</label>
+                    <select asp-for="DocumentType" class="form-select">
+                        <option value="Lab Report">Lab Report (Blood, Urine, Biochemistry)</option>
+                        <option value="Radiology / Scan">Radiology / Scan (X-Ray, MRI, CT Scan, Ultrasound)</option>
+                        <option value="Prescription Scan">Prescription Scan</option>
+                        <option value="Discharge Summary">Hospital Discharge Summary</option>
+                        <option value="Other">Other Clinical Document</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="File" class="form-label fw-semibold small text-secondary">Select Document File <span class="text-danger">*</span></label>
+                    <input asp-for="File" class="form-control" type="file" accept=".pdf,.png,.jpg,.jpeg" />
+                    <span asp-validation-for="File" class="text-danger small"></span>
+                    <small class="text-muted">Supported formats: PDF, PNG, JPG (Maximum size: 10 MB)</small>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">
+                        <i class="bi bi-upload me-1"></i> Upload Securely
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

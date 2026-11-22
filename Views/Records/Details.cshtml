@@ -1,0 +1,167 @@
+@model CsharpProject.Models.MedicalRecord
+@{
+    ViewData["Title"] = $"Consultation Record #{Model.Id}";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back to Medical Records
+            </a>
+            <a asp-action="Print" asp-route-id="@Model.Id" target="_blank" class="btn btn-primary btn-sm shadow-sm">
+                <i class="bi bi-printer-fill me-1"></i> Print Prescription PDF
+            </a>
+        </div>
+
+        <div class="adidev-card p-4 p-md-5 shadow-sm mb-4">
+            <!-- Header -->
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between pb-3 border-bottom mb-4">
+                <div>
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">DIGITAL MEDICAL RECORD #@Model.Id</span>
+                    <h3 class="fw-bold text-dark mt-1 mb-0">Clinical Consultation &amp; Rx</h3>
+                </div>
+                <div class="text-md-end text-muted small">
+                    <div>Consultation Date: <strong>@Model.CreatedAtUtc.ToString("dd MMMM yyyy &bull; hh:mm tt")</strong></div>
+                    <div>Appointment Ref: <strong>#@Model.AppointmentId</strong></div>
+                </div>
+            </div>
+
+            <!-- Patient & Doctor Card -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3 border h-100">
+                        <h6 class="fw-bold text-primary mb-2"><i class="bi bi-person-heart me-1"></i> Patient Demographics</h6>
+                        <div class="fw-bold text-dark">@(Model.Patient?.DisplayName ?? Model.Appointment.Patient.DisplayName)</div>
+                        <div class="small text-muted">Gender: @(Model.Patient?.Gender ?? Model.Appointment.Patient.Gender ?? "N/A")</div>
+                        <div class="small text-muted">Blood Group: @(Model.Patient?.BloodGroup ?? Model.Appointment.Patient.BloodGroup ?? "N/A")</div>
+                        <div class="small text-muted">Known Allergies: @(Model.Patient?.Allergies ?? Model.Appointment.Patient.Allergies ?? "None recorded")</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3 border h-100">
+                        <h6 class="fw-bold text-primary mb-2"><i class="bi bi-stethoscope me-1"></i> Consulting Practitioner</h6>
+                        <div class="fw-bold text-dark">Dr. @(Model.Doctor?.User?.DisplayName ?? Model.Appointment.Doctor.User.DisplayName)</div>
+                        <div class="small text-muted">Specialty: @(Model.Doctor?.Specialty ?? Model.Appointment.Doctor.Specialty)</div>
+                        <div class="small text-muted">Qualifications: @(Model.Doctor?.Qualification ?? Model.Appointment.Doctor.Qualification)</div>
+                        <div class="small text-muted">OPD Clinic: Room @(Model.Doctor?.RoomNumber ?? Model.Appointment.Doctor.RoomNumber)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recorded Vitals -->
+            <div class="mb-4">
+                <h6 class="fw-bold text-dark mb-2"><i class="bi bi-heart-pulse-fill text-danger me-1"></i> Recorded Vital Signs</h6>
+                <div class="row g-2 text-center">
+                    <div class="col-6 col-md-2">
+                        <div class="p-2 border rounded bg-white">
+                            <small class="text-muted d-block">Blood Pressure</small>
+                            <span class="fw-bold text-dark">@(Model.BloodPressure ?? "N/A")</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="p-2 border rounded bg-white">
+                            <small class="text-muted d-block">Heart Rate</small>
+                            <span class="fw-bold text-dark">@(Model.HeartRate ?? "N/A")</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="p-2 border rounded bg-white">
+                            <small class="text-muted d-block">Temperature</small>
+                            <span class="fw-bold text-dark">@(Model.Temperature ?? "N/A")</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="p-2 border rounded bg-white">
+                            <small class="text-muted d-block">SpO2</small>
+                            <span class="fw-bold text-dark">@(Model.SpO2 ?? "N/A")</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="p-2 border rounded bg-white">
+                            <small class="text-muted d-block">Weight</small>
+                            <span class="fw-bold text-dark">@(Model.WeightKg?.ToString("0.0") ?? "N/A") kg</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="p-2 border rounded bg-white">
+                            <small class="text-muted d-block">Follow-up</small>
+                            <span class="fw-bold text-primary">@(Model.FollowUpDate?.ToString("dd MMM yyyy") ?? "As needed")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diagnosis & Clinical Observations -->
+            <div class="mb-4">
+                <h6 class="fw-bold text-dark mb-2">Clinical Diagnosis</h6>
+                <div class="p-3 bg-light rounded-3 border fw-semibold text-primary">
+                    @Model.Diagnosis
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Notes))
+            {
+                <div class="mb-4">
+                    <h6 class="fw-bold text-dark mb-2">Clinical Notes &amp; Observations</h6>
+                    <div class="p-3 bg-light rounded-3 border text-secondary small">
+                        @Model.Notes
+                    </div>
+                </div>
+            }
+
+            <!-- Prescriptions Table -->
+            <div class="mb-4">
+                <h6 class="fw-bold text-dark mb-2"><i class="bi bi-capsule text-success me-1"></i> Prescribed Medications (Rx)</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Medication</th>
+                                <th>Dosage</th>
+                                <th>Frequency</th>
+                                <th>Duration</th>
+                                <th>Food Timing</th>
+                                <th>Instructions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{ int idx = 1; }
+                            @foreach (var p in Model.Prescriptions)
+                            {
+                                <tr>
+                                    <td>@(idx++)</td>
+                                    <td class="fw-bold text-dark">@p.Medication</td>
+                                    <td>@p.Dosage</td>
+                                    <td><span class="badge bg-light text-dark border">@p.Frequency</span></td>
+                                    <td>@p.Duration</td>
+                                    <td>@p.MealTiming</td>
+                                    <td class="small text-muted">@p.Instructions</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Attached Documents -->
+            @if (Model.Documents.Any())
+            {
+                <div class="pt-3 border-top">
+                    <h6 class="fw-bold text-dark mb-2"><i class="bi bi-paperclip me-1"></i> Attached Reports &amp; Diagnostic Scans</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (var doc in Model.Documents)
+                        {
+                            <a asp-controller="Documents" asp-action="Download" asp-route-id="@doc.Id" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2" target="_blank">
+                                <i class="bi bi-file-earmark-pdf-fill text-danger"></i>
+                                <span>@doc.Title</span>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

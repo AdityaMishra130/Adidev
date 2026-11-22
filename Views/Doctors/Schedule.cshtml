@@ -1,0 +1,70 @@
+@model CsharpProject.Models.DoctorScheduleViewModel
+@{
+    ViewData["Title"] = "My Clinic OPD Schedule";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-md-8 col-lg-6">
+        <div class="adidev-card p-4 p-md-5 shadow-sm">
+            <div class="text-center mb-4">
+                <div class="stat-icon stat-icon-primary mx-auto mb-3">
+                    <i class="bi bi-calendar2-range-fill"></i>
+                </div>
+                <h4 class="fw-bold text-dark m-0">My Clinic Hours &amp; Fee</h4>
+                <p class="text-muted small">Configure your patient consultation days, hours, and OPD room</p>
+            </div>
+
+            <form asp-action="Schedule" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Specialty" class="form-label fw-semibold small text-secondary">Medical Specialty</label>
+                    <input asp-for="Specialty" class="form-control bg-light" readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="AvailableDays" class="form-label fw-semibold small text-secondary"></label>
+                    <input asp-for="AvailableDays" class="form-control" placeholder="Monday,Tuesday,Wednesday,Thursday,Friday" />
+                    <span asp-validation-for="AvailableDays" class="text-danger small"></span>
+                    <small class="text-muted">Comma-separated weekday names where you take appointments.</small>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label asp-for="StartTime" class="form-label fw-semibold small text-secondary"></label>
+                        <input asp-for="StartTime" class="form-control" type="time" />
+                        <span asp-validation-for="StartTime" class="text-danger small"></span>
+                    </div>
+                    <div class="col-6">
+                        <label asp-for="EndTime" class="form-label fw-semibold small text-secondary"></label>
+                        <input asp-for="EndTime" class="form-control" type="time" />
+                        <span asp-validation-for="EndTime" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <label asp-for="ConsultationFee" class="form-label fw-semibold small text-secondary"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input asp-for="ConsultationFee" class="form-control" type="number" step="50" />
+                        </div>
+                        <span asp-validation-for="ConsultationFee" class="text-danger small"></span>
+                    </div>
+                    <div class="col-6">
+                        <label asp-for="RoomNumber" class="form-label fw-semibold small text-secondary"></label>
+                        <input asp-for="RoomNumber" class="form-control" />
+                        <span asp-validation-for="RoomNumber" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <a asp-controller="Dashboard" asp-action="Doctor" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">Save Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

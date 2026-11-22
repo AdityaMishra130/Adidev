@@ -1,0 +1,164 @@
+@model CsharpProject.Models.CreateMedicalRecordViewModel
+@{
+    ViewData["Title"] = "Record Consultation & Prescribe";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-lg-10">
+        <div class="adidev-card p-4 p-md-5 shadow-sm">
+            <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+                <div>
+                    <h3 class="fw-bold text-dark m-0">Clinical Consultation &amp; Prescription</h3>
+                    <p class="text-muted small m-0">Patient: <strong>@Model.PatientName</strong> &bull; Scheduled Visit: @Model.AppointmentTime.ToString("dd MMM yyyy, hh:mm tt")</p>
+                </div>
+                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 fs-6">
+                    Appointment #@Model.AppointmentId
+                </span>
+            </div>
+
+            <form asp-action="Create" method="post" id="rxForm">
+                <input type="hidden" asp-for="AppointmentId" />
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                <!-- Section 1: Patient Vitals -->
+                <div class="p-3 bg-light rounded-3 border mb-4">
+                    <h6 class="fw-bold text-danger mb-3"><i class="bi bi-heart-pulse-fill me-1"></i> Patient Vital Signs</h6>
+                    <div class="row g-3">
+                        <div class="col-sm-6 col-md-4">
+                            <label asp-for="BloodPressure" class="form-label fw-semibold small text-secondary"></label>
+                            <input asp-for="BloodPressure" class="form-control" placeholder="e.g. 120/80 mmHg" />
+                        </div>
+                        <div class="col-sm-6 col-md-2">
+                            <label asp-for="HeartRate" class="form-label fw-semibold small text-secondary"></label>
+                            <input asp-for="HeartRate" class="form-control" placeholder="72 bpm" />
+                        </div>
+                        <div class="col-sm-6 col-md-2">
+                            <label asp-for="Temperature" class="form-label fw-semibold small text-secondary"></label>
+                            <input asp-for="Temperature" class="form-control" placeholder="98.6 °F" />
+                        </div>
+                        <div class="col-sm-6 col-md-2">
+                            <label asp-for="SpO2" class="form-label fw-semibold small text-secondary"></label>
+                            <input asp-for="SpO2" class="form-control" placeholder="98%" />
+                        </div>
+                        <div class="col-sm-6 col-md-2">
+                            <label asp-for="WeightKg" class="form-label fw-semibold small text-secondary"></label>
+                            <input asp-for="WeightKg" class="form-control" type="number" step="0.5" placeholder="68.5" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Clinical Assessment -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <label asp-for="Diagnosis" class="form-label fw-semibold small text-secondary">Clinical Diagnosis <span class="text-danger">*</span></label>
+                        <input asp-for="Diagnosis" class="form-control" placeholder="e.g. Acute Bronchitis, Essential Hypertension, Migraine" />
+                        <span asp-validation-for="Diagnosis" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Notes" class="form-label fw-semibold small text-secondary">Clinical Examination Notes &amp; Observations</label>
+                        <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Patient complains of productive cough x 4 days, chest clear on auscultation, no fever..."></textarea>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="FollowUpDate" class="form-label fw-semibold small text-secondary"></label>
+                        <input asp-for="FollowUpDate" class="form-control" type="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    </div>
+                </div>
+
+                <!-- Section 3: Prescriptions (Rx) -->
+                <div class="p-3 bg-light rounded-3 border mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h6 class="fw-bold text-success m-0"><i class="bi bi-capsule me-1"></i> Medical Prescription (Rx)</h6>
+                    </div>
+
+                    <!-- Primary Medicine -->
+                    <div class="row g-2 mb-3 pb-3 border-bottom">
+                        <div class="col-md-4">
+                            <label asp-for="Medication" class="form-label fw-semibold small text-secondary">Medication <span class="text-danger">*</span></label>
+                            <input asp-for="Medication" class="form-control" placeholder="e.g. Amoxicillin Clavulanate" />
+                            <span asp-validation-for="Medication" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-2">
+                            <label asp-for="Dosage" class="form-label fw-semibold small text-secondary">Dosage <span class="text-danger">*</span></label>
+                            <input asp-for="Dosage" class="form-control" placeholder="625 mg" />
+                            <span asp-validation-for="Dosage" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-2">
+                            <label asp-for="Frequency" class="form-label fw-semibold small text-secondary">Frequency</label>
+                            <select asp-for="Frequency" class="form-select">
+                                <option value="1-0-1 (Twice daily)">1-0-1 (Twice daily)</option>
+                                <option value="1-0-0 (Morning)">1-0-0 (Morning)</option>
+                                <option value="0-0-1 (Night)">0-0-1 (Night)</option>
+                                <option value="1-1-1 (Thrice daily)">1-1-1 (Thrice daily)</option>
+                                <option value="SOS (As needed)">SOS (As needed)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label asp-for="Duration" class="form-label fw-semibold small text-secondary">Duration</label>
+                            <input asp-for="Duration" class="form-control" placeholder="5 days" />
+                        </div>
+                        <div class="col-md-2">
+                            <label asp-for="MealTiming" class="form-label fw-semibold small text-secondary">Food Timing</label>
+                            <select asp-for="MealTiming" class="form-select">
+                                <option value="After food">After food</option>
+                                <option value="Before food">Before food</option>
+                                <option value="With food">With food</option>
+                            </select>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <input asp-for="Instructions" class="form-control" placeholder="Special patient instructions (e.g. Drink plenty of water)..." />
+                        </div>
+                    </div>
+
+                    <!-- Additional Medicine 2 -->
+                    <div class="row g-2 mb-2">
+                        <div class="col-md-4">
+                            <input name="AdditionalMedicines[0].Medication" class="form-control" placeholder="Medicine 2 (Optional, e.g. Paracetamol)" />
+                        </div>
+                        <div class="col-md-2">
+                            <input name="AdditionalMedicines[0].Dosage" class="form-control" placeholder="650 mg" />
+                        </div>
+                        <div class="col-md-2">
+                            <input name="AdditionalMedicines[0].Frequency" class="form-control" placeholder="1-0-1" value="1-0-1" />
+                        </div>
+                        <div class="col-md-2">
+                            <input name="AdditionalMedicines[0].Duration" class="form-control" placeholder="3 days" value="3 days" />
+                        </div>
+                        <div class="col-md-2">
+                            <input name="AdditionalMedicines[0].MealTiming" class="form-control" placeholder="After food" value="After food" />
+                        </div>
+                    </div>
+
+                    <!-- Additional Medicine 3 -->
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <input name="AdditionalMedicines[1].Medication" class="form-control" placeholder="Medicine 3 (Optional, e.g. Pantoprazole)" />
+                        </div>
+                        <div class="col-md-2">
+                            <input name="AdditionalMedicines[1].Dosage" class="form-control" placeholder="40 mg" />
+                        </div>
+                        <div class="col-md-2">
+                            <input name="AdditionalMedicines[1].Frequency" class="form-control" placeholder="1-0-0" value="1-0-0" />
+                        </div>
+                        <div class="col-md-2">
+                            <input name="AdditionalMedicines[1].Duration" class="form-control" placeholder="5 days" value="5 days" />
+                        </div>
+                        <div class="col-md-2">
+                            <input name="AdditionalMedicines[1].MealTiming" class="form-control" placeholder="Before food" value="Before food" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <a asp-controller="Appointments" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
+                        <i class="bi bi-check2-circle me-1"></i> Save Consultation &amp; Issue Prescription
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

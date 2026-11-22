@@ -1,0 +1,108 @@
+@model List<CsharpProject.Models.Doctor>
+@{
+    ViewData["Title"] = "Find Doctors & Specialists";
+    var departments = ViewBag.Departments as List<CsharpProject.Models.Department> ?? new();
+    int? selectedDeptId = ViewBag.SelectedDepartmentId;
+    string? searchTerm = ViewBag.SearchTerm;
+}
+
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
+    <div>
+        <h3 class="fw-bold text-dark m-0">Our Medical Specialists</h3>
+        <p class="text-muted small m-0">Find and consult board-certified physicians across multidisciplinary hospital departments</p>
+    </div>
+    @if (User.IsInRole(CsharpProject.Models.PortalRoles.Admin))
+    {
+        <a asp-action="Manage" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-gear me-1"></i> Admin Staff Console
+        </a>
+    }
+</div>
+
+<!-- Search & Department Filter Bar -->
+<div class="adidev-card p-3 mb-4 shadow-sm">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-md-5">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="search" class="form-control border-start-0" placeholder="Search by doctor name or specialty..." value="@searchTerm" />
+            </div>
+        </div>
+        <div class="col-md-5">
+            <select name="departmentId" class="form-select">
+                <option value="">All Departments &amp; Specialties</option>
+                @foreach (var dept in departments)
+                {
+                    <option value="@dept.Id" selected="@(selectedDeptId == dept.Id)">@dept.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100 fw-semibold">Filter</button>
+        </div>
+    </form>
+</div>
+
+<!-- Doctors Grid -->
+<div class="row g-4">
+    @if (!Model.Any())
+    {
+        <div class="col-12 text-center py-5">
+            <div class="stat-icon stat-icon-primary mx-auto mb-3">
+                <i class="bi bi-person-x"></i>
+            </div>
+            <h5 class="fw-bold text-dark">No specialists found</h5>
+            <p class="text-muted small">Try clearing filters or search terms to find available doctors.</p>
+            <a asp-action="Index" class="btn btn-outline-primary btn-sm">Reset Filters</a>
+        </div>
+    }
+    @foreach (var doc in Model)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="adidev-card adidev-card-hover p-4 h-100 d-flex flex-column shadow-sm">
+                <div class="d-flex align-items-start gap-3 mb-3">
+                    <span class="avatar-badge flex-shrink-0" style="width: 54px; height: 54px; font-size: 1.35rem;">
+                        @doc.User.DisplayName.Substring(doc.User.DisplayName.IndexOf(" ") + 1 > 0 ? doc.User.DisplayName.IndexOf(" ") + 1 : 0, 1)
+                    </span>
+                    <div>
+                        <h5 class="fw-bold text-dark m-0">@doc.User.DisplayName</h5>
+                        <span class="badge bg-light text-primary border mt-1">@(doc.Department?.Name ?? doc.Specialty)</span>
+                        <div class="text-muted small mt-1">@doc.Qualification</div>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-light rounded-3 mb-3 small">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Experience:</span>
+                        <span class="fw-semibold text-dark">@doc.ExperienceYears Years</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Consultation Fee:</span>
+                        <span class="fw-bold text-success">₹@doc.ConsultationFee.ToString("0")</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Clinic OPD:</span>
+                        <span class="fw-semibold text-dark">@doc.RoomNumber</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Hours:</span>
+                        <span class="fw-semibold text-dark">@doc.StartTime.ToString("hh\\:mm tt") - @doc.EndTime.ToString("hh\\:mm tt")</span>
+                    </div>
+                </div>
+
+                <div class="small text-muted mb-3 flex-grow-1">
+                    <i class="bi bi-calendar-check me-1 text-primary"></i> <strong>Days:</strong> @doc.AvailableDays
+                </div>
+
+                <div class="d-flex gap-2 mt-auto">
+                    <a asp-action="Details" asp-route-id="@doc.Id" class="btn btn-outline-secondary btn-sm flex-fill">
+                        Profile
+                    </a>
+                    <a asp-controller="Appointments" asp-action="Create" asp-route-doctorId="@doc.Id" class="btn btn-primary btn-sm flex-fill shadow-sm">
+                        <i class="bi bi-calendar-plus me-1"></i> Book Slot
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

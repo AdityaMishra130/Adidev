@@ -1,0 +1,73 @@
+@model List<CsharpProject.Models.Notification>
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-lg-8">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-bold text-dark m-0">In-App Notifications</h3>
+                <p class="text-muted small m-0">Live alerts for appointment bookings, doctor confirmations, and prescription releases</p>
+            </div>
+            @if (Model.Any(n => !n.IsRead))
+            {
+                <form asp-action="MarkAllRead" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-check2-all me-1"></i> Mark All as Read
+                    </button>
+                </form>
+            }
+        </div>
+
+        <div class="adidev-card shadow-sm overflow-hidden">
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-bell-slash fs-1 d-block mb-2"></i>
+                    No notifications yet.
+                </div>
+            }
+            else
+            {
+                <div class="list-group list-group-flush">
+                    @foreach (var n in Model)
+                    {
+                        <div class="list-group-item p-3 @(!n.IsRead ? "bg-light border-start border-4 border-primary" : "")">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi @(n.Type == "MedicalRecord" ? "bi-file-earmark-medical text-success" : "bi-calendar-check text-primary") fs-5"></i>
+                                    <span class="fw-bold text-dark">@n.Title</span>
+                                    @if (!n.IsRead)
+                                    {
+                                        <span class="badge bg-danger rounded-pill" style="font-size: 0.65rem;">NEW</span>
+                                    }
+                                </div>
+                                <small class="text-muted">@n.CreatedAtUtc.ToString("dd MMM, hh:mm tt")</small>
+                            </div>
+
+                            <p class="text-secondary small mb-2 ms-4">@n.Message</p>
+
+                            <div class="d-flex align-items-center gap-2 ms-4">
+                                @if (!string.IsNullOrEmpty(n.RelatedUrl))
+                                {
+                                    <a href="@n.RelatedUrl" class="btn btn-sm btn-primary py-0 px-2" style="font-size: 0.78rem;">
+                                        View Details
+                                    </a>
+                                }
+                                @if (!n.IsRead)
+                                {
+                                    <form asp-action="MarkAsRead" asp-route-id="@n.Id" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-link text-muted py-0 text-decoration-none" style="font-size: 0.78rem;">
+                                            Dismiss
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

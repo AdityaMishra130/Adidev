@@ -1,0 +1,50 @@
+@model CsharpProject.Models.Department
+@{
+    ViewData["Title"] = "Add Department";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-md-8 col-lg-6">
+        <div class="adidev-card p-4 p-md-5 shadow-sm">
+            <div class="text-center mb-4">
+                <div class="stat-icon stat-icon-primary mx-auto mb-3">
+                    <i class="bi bi-building-add"></i>
+                </div>
+                <h4 class="fw-bold text-dark m-0">Add Clinical Department</h4>
+                <p class="text-muted small">Create a medical specialty unit</p>
+            </div>
+
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label fw-semibold small text-secondary">Department Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="e.g. Ophthalmology, Nephrology" />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label fw-semibold small text-secondary">Description &amp; Scope of Care</label>
+                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Overview of medical services offered..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Icon" class="form-label fw-semibold small text-secondary">Bootstrap Icon Class</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-palette"></i></span>
+                        <input asp-for="Icon" class="form-control" placeholder="bi-heart-pulse, bi-eye, bi-activity" />
+                    </div>
+                    <small class="text-muted">Options: bi-heart-pulse, bi-activity, bi-emoji-smile, bi-person-arms-up, bi-capsule, bi-shield-check, bi-virus, bi-eye</small>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">Create Department</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,87 @@
+@model CsharpProject.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Sign In";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-md-8 col-lg-5">
+        <div class="adidev-card p-4 p-md-5 shadow-lg">
+            <div class="text-center mb-4">
+                <div class="stat-icon stat-icon-primary mx-auto mb-3">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                </div>
+                <h3 class="fw-bold text-dark m-0">Sign In to Adidev</h3>
+                <p class="text-muted small">Healthcare Appointment &amp; Records Management</p>
+            </div>
+
+            <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label fw-semibold small text-secondary"></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                        <input asp-for="Email" class="form-control border-start-0 ps-0" placeholder="name@example.com" autofocus autocomplete="username" />
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <label asp-for="Password" class="form-label fw-semibold small text-secondary mb-0"></label>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                        <input asp-for="Password" class="form-control border-start-0 ps-0" placeholder="••••••••" autocomplete="current-password" />
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4 form-check">
+                    <input asp-for="RememberMe" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label small text-secondary"></label>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to Portal
+                </button>
+            </form>
+
+            <div class="text-center mt-4 pt-3 border-top">
+                <span class="text-muted small">New patient?</span>
+                <a asp-action="Register" class="fw-bold text-primary small ms-1">Create an account</a>
+            </div>
+
+            <!-- Demo Quick Login Helper for SIH Reviewers -->
+            <div class="mt-4 p-3 bg-light rounded-3 border">
+                <div class="d-flex align-items-center gap-1 mb-2 text-primary fw-bold small">
+                    <i class="bi bi-info-circle-fill"></i> SIH Demo Quick Login Accounts:
+                </div>
+                <div class="d-flex flex-column gap-1 small text-secondary">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><strong>Admin:</strong> admin@adidevhealth.com</span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="fillCreds('admin@adidevhealth.com', 'Admin@12345')">Fill</button>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><strong>Doctor:</strong> doctor.cardio@adidevhealth.com</span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="fillCreds('doctor.cardio@adidevhealth.com', 'Doctor@12345')">Fill</button>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><strong>Patient:</strong> patient@adidevhealth.com</span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="fillCreds('patient@adidevhealth.com', 'Patient@12345')">Fill</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function fillCreds(email, pwd) {
+            $('#Email').val(email);
+            $('#Password').val(pwd);
+        }
+    </script>
+}

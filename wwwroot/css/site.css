@@ -1,0 +1,390 @@
+:root {
+    --primary-color: #0284c7;
+    --primary-dark: #0369a1;
+    --primary-light: #e0f2fe;
+    --primary-gradient: linear-gradient(135deg, #0284c7 0%, #0891b2 100%);
+    --secondary-color: #64748b;
+    --accent-color: #06b6d4;
+    --bg-body: #f8fafc;
+    --surface-card: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --border-color: #e2e8f0;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+    --shadow-subtle: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+}
+
+body.adidev-body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header & Navbar */
+.adidev-navbar {
+    background: #ffffff;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-subtle);
+    z-index: 1030;
+}
+
+.adidev-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.brand-icon {
+    width: 38px;
+    height: 38px;
+    background: var(--primary-gradient);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    box-shadow: 0 4px 10px rgba(2, 132, 199, 0.35);
+}
+
+.brand-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    display: block;
+    line-height: 1.1;
+}
+
+.brand-accent {
+    color: var(--primary-color);
+}
+
+.brand-subtitle {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    letter-spacing: 0.08em;
+    display: block;
+}
+
+.role-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.05em;
+}
+
+.role-admin {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.role-doctor {
+    background-color: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.role-patient {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.nav-item-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.92rem;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    transition: all 0.15s ease-in-out;
+}
+
+.nav-item-link:hover, .nav-item-link.active {
+    color: var(--primary-color);
+    background-color: var(--primary-light);
+}
+
+.user-chip {
+    background: #f1f5f9;
+    border: 1px solid var(--border-color);
+    padding: 4px 12px 4px 4px;
+    border-radius: var(--radius-full);
+    font-size: 0.88rem;
+    color: var(--text-primary);
+}
+
+.user-chip:hover {
+    background: #e2e8f0;
+}
+
+.avatar-badge {
+    width: 32px;
+    height: 32px;
+    background: var(--primary-gradient);
+    color: white;
+    font-weight: 700;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+}
+
+.btn-icon-light {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    border: 1px solid var(--border-color);
+    transition: background 0.15s;
+}
+
+.btn-icon-light:hover {
+    background: #e2e8f0;
+}
+
+/* Cards & Surfaces */
+.adidev-card {
+    background: var(--surface-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.adidev-card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.stat-widget {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    box-shadow: var(--shadow-card);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-widget::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+}
+
+.stat-widget-primary::before { background-color: var(--primary-color); }
+.stat-widget-success::before { background-color: var(--success-color); }
+.stat-widget-warning::before { background-color: var(--warning-color); }
+.stat-widget-danger::before { background-color: var(--danger-color); }
+.stat-widget-accent::before { background-color: var(--accent-color); }
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+.stat-icon-primary { background: #e0f2fe; color: #0284c7; }
+.stat-icon-success { background: #dcfce7; color: #16a34a; }
+.stat-icon-warning { background: #fef3c7; color: #d97706; }
+.stat-icon-danger { background: #fee2e2; color: #dc2626; }
+.stat-icon-accent { background: #ccfbf1; color: #0d9488; }
+
+.stat-number {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.85rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text-primary);
+}
+
+.stat-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+}
+
+/* Hero Section */
+.hero-banner {
+    background: linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #0891b2 100%);
+    color: white;
+    border-radius: var(--radius-lg);
+    padding: 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-banner::after {
+    content: '';
+    position: absolute;
+    right: -80px;
+    bottom: -80px;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+}
+
+/* Badges for Appointment Statuses */
+.status-badge {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-pending { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.status-confirmed { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; }
+.status-completed { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+.status-cancelled { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+.status-rejected { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+/* Slot Picker Grid */
+.slot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+}
+
+.slot-btn {
+    border: 1px solid var(--border-color);
+    background: white;
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.slot-btn:hover:not(:disabled) {
+    border-color: var(--primary-color);
+    background: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+.slot-btn.selected {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.slot-btn:disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+    cursor: not-allowed;
+    border-color: #e2e8f0;
+    text-decoration: line-through;
+}
+
+/* Tables */
+.adidev-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+.adidev-table th {
+    background: #f8fafc;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.adidev-table td {
+    padding: 14px 16px;
+    font-size: 0.88rem;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.adidev-table tr:hover td {
+    background: #f8fafc;
+}
+
+/* Printable Prescription Styles */
+.prescription-paper {
+    background: #ffffff;
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 2.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+}
+
+.rx-symbol {
+    font-family: serif;
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.vitals-bar {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: var(--radius-sm);
+    padding: 10px 16px;
+}
+
+@media print {
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    .adidev-navbar,
+    .adidev-footer,
+    .no-print,
+    .btn {
+        display: none !important;
+    }
+    .adidev-main {
+        padding: 0 !important;
+    }
+    .prescription-paper {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+    }
+}

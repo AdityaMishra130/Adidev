@@ -1,0 +1,41 @@
+@{
+    ViewData["Title"] = "Data Privacy & Healthcare Compliance";
+}
+
+<div class="container py-4">
+    <div class="adidev-card p-5 max-w-800 mx-auto">
+        <div class="text-center mb-5">
+            <div class="stat-icon stat-icon-primary mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.75rem;">
+                <i class="bi bi-shield-check"></i>
+            </div>
+            <h2 class="fw-bold text-dark">Data Privacy &amp; Healthcare Security</h2>
+            <p class="text-muted">Adidev Hospital Management Portal Architecture</p>
+        </div>
+
+        <div class="mb-4">
+            <h5 class="fw-bold text-primary"><i class="bi bi-lock-fill me-2"></i> Role-Based Access Control (RBAC)</h5>
+            <p class="text-secondary small">
+                Every consultation record, diagnosis, and prescription is protected by granular role authorization:
+                Patients can only access their personal medical records, doctors can only access records for their assigned patients, and administrators supervise system health without compromising confidential diagnosis notes.
+            </p>
+        </div>
+
+        <div class="mb-4">
+            <h5 class="fw-bold text-primary"><i class="bi bi-file-earmark-lock-fill me-2"></i> Confidential Clinical Prescriptions</h5>
+            <p class="text-secondary small">
+                Prescriptions and lab reports are digitally stored with sanitized identifiers and strict anti-forgery validation. File uploads are validated through MIME whitelist verification to prevent arbitrary executable execution.
+            </p>
+        </div>
+
+        <div class="mb-4">
+            <h5 class="fw-bold text-primary"><i class="bi bi-key-fill me-2"></i> JWT &amp; Secure Session Authentication</h5>
+            <p class="text-secondary small">
+                Web workflows run on HTTP-only, SameSite=Lax authentication cookies with ASP.NET Core Identity PBKDF2 password hashing. Mobile and external API integrations use cryptographically signed JWT Bearer tokens with strict 30-minute expiry windows.
+            </p>
+        </div>
+
+        <div class="p-3 bg-light rounded-3 border text-center text-muted small mt-5">
+            Designed for Smart India Hackathon (SIH) &bull; Hospital Appointment Booking and Patient Record Portal &bull; Adidev Health
+        </div>
+    </div>
+</div>

@@ -1,0 +1,270 @@
+@model CsharpProject.Models.DoctorDashboardViewModel
+@{
+    ViewData["Title"] = "Doctor Clinic Dashboard";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h3 class="fw-bold text-dark m-0">Clinician Portal &bull; Dr. @Model.Doctor.User.DisplayName</h3>
+        <p class="text-muted small m-0">@Model.Doctor.Qualification &bull; @(Model.Doctor.Department?.Name ?? Model.Doctor.Specialty) &bull; Room: @Model.Doctor.RoomNumber</p>
+    </div>
+    <a asp-controller="Doctors" asp-action="Schedule" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-clock-history me-1"></i> Edit Clinic Hours
+    </a>
+</div>
+
+<!-- Metrics Row -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="stat-widget stat-widget-primary">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number">@Model.TodayAppointments.Count</div>
+                    <div class="stat-label">Today's Visits</div>
+                </div>
+                <div class="stat-icon stat-icon-primary">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+            </div>
+            <div class="mt-2 text-muted small">Scheduled for @DateTime.Today.ToString("dd MMM yyyy")</div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+        <div class="stat-widget stat-widget-warning">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number">@Model.PendingRequests.Count</div>
+                    <div class="stat-label">Pending Approval</div>
+                </div>
+                <div class="stat-icon stat-icon-warning">
+                    <i class="bi bi-bell"></i>
+                </div>
+            </div>
+            <div class="mt-2 text-muted small">New patient requests awaiting decision</div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+        <div class="stat-widget stat-widget-success">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number">@Model.CompletedCount</div>
+                    <div class="stat-label">Completed Consults</div>
+                </div>
+                <div class="stat-icon stat-icon-success">
+                    <i class="bi bi-check2-circle"></i>
+                </div>
+            </div>
+            <div class="mt-2 text-muted small">Treated &amp; prescriptions recorded</div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+        <div class="stat-widget stat-widget-accent">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number">@Model.TotalPatientCount</div>
+                    <div class="stat-label">Total Patients</div>
+                </div>
+                <div class="stat-icon stat-icon-accent">
+                    <i class="bi bi-people"></i>
+                </div>
+            </div>
+            <div class="mt-2 text-muted small">Unique patient consultations</div>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Approval Queue -->
+@if (Model.PendingRequests.Any())
+{
+    <div class="adidev-card p-4 shadow-sm mb-4 border-warning">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="fw-bold text-dark m-0">
+                <i class="bi bi-exclamation-circle-fill text-warning me-2"></i> Pending Patient Booking Requests (@Model.PendingRequests.Count)
+            </h5>
+            <small class="text-muted">Confirm or decline appointment requests</small>
+        </div>
+
+        <div class="table-responsive">
+            <table class="adidev-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Requested Date &amp; Slot</th>
+                        <th>Reason for Consultation</th>
+                        <th class="text-end">Doctor Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var apt in Model.PendingRequests)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-dark">@apt.Patient.DisplayName</div>
+                                <small class="text-muted">Contact: @apt.Patient.PhoneNumber | Age: @(apt.Patient.DateOfBirth.HasValue ? (DateTime.Today.Year - apt.Patient.DateOfBirth.Value.Year) + " yrs" : "N/A")</small>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-primary">@apt.StartsAt.ToString("ddd, dd MMM yyyy")</div>
+                                <small class="text-muted">@apt.StartsAt.ToString("hh:mm tt") (30 mins)</small>
+                            </td>
+                            <td>
+                                <span class="text-secondary small">@apt.Reason</span>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-2">
+                                    <form asp-controller="Appointments" asp-action="Confirm" asp-route-id="@apt.Id" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-success px-3 fw-semibold">
+                                            <i class="bi bi-check-lg me-1"></i> Accept
+                                        </button>
+                                    </form>
+                                    <button type="button" class="btn btn-sm btn-outline-danger px-2" data-bs-toggle="modal" data-bs-target="#rejectModal-@apt.Id">
+                                        Decline
+                                    </button>
+                                </div>
+
+                                <!-- Decline Modal -->
+                                <div class="modal fade" id="rejectModal-@apt.Id" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content text-start">
+                                            <div class="modal-header">
+                                                <h6 class="modal-title fw-bold">Decline Appointment #@apt.Id</h6>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <form asp-controller="Appointments" asp-action="Reject" asp-route-id="@apt.Id" method="post">
+                                                <div class="modal-body">
+                                                    <p class="small text-muted mb-2">Please state the reason for declining this request so the patient can reschedule:</p>
+                                                    <textarea name="reason" class="form-control" rows="3" placeholder="e.g. In emergency surgery, please book another slot." required></textarea>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-sm btn-danger">Decline Request</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<!-- Today's Appointments & Upcoming -->
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="adidev-card shadow-sm overflow-hidden h-100">
+            <div class="p-3 bg-white border-bottom d-flex align-items-center justify-content-between">
+                <h5 class="fw-bold text-dark m-0"><i class="bi bi-calendar-check text-primary me-2"></i>Today's OPD Queue</h5>
+                <span class="badge bg-primary">@DateTime.Today.ToString("dd MMM yyyy")</span>
+            </div>
+            <div class="table-responsive">
+                <table class="adidev-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Patient Details</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th class="text-end">Consultation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.TodayAppointments.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="bi bi-calendar2-x fs-1 d-block mb-2"></i>
+                                    No appointments scheduled for today.
+                                </td>
+                            </tr>
+                        }
+                        @foreach (var apt in Model.TodayAppointments)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-primary">@apt.StartsAt.ToString("hh:mm tt")</div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">@apt.Patient.DisplayName</div>
+                                    <small class="text-muted">Blood: @(apt.Patient.BloodGroup ?? "N/A")</small>
+                                </td>
+                                <td>
+                                    <span class="small text-truncate d-inline-block" style="max-width: 140px;">@apt.Reason</span>
+                                </td>
+                                <td>
+                                    @switch (apt.Status)
+                                    {
+                                        case AppointmentStatus.Pending:
+                                            <span class="status-badge status-pending">Pending</span>
+                                            break;
+                                        case AppointmentStatus.Confirmed:
+                                            <span class="status-badge status-confirmed">Confirmed</span>
+                                            break;
+                                        case AppointmentStatus.Completed:
+                                            <span class="status-badge status-completed">Completed</span>
+                                            break;
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    @if (apt.Status == AppointmentStatus.Completed)
+                                    {
+                                        <a asp-controller="Records" asp-action="Index" class="btn btn-sm btn-outline-success py-1">
+                                            <i class="bi bi-check-circle me-1"></i> View Record
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <form asp-controller="Appointments" asp-action="Complete" asp-route-id="@apt.Id" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-primary py-1 px-3 shadow-sm">
+                                                <i class="bi bi-pencil-square me-1"></i> Consult &amp; Rx
+                                            </button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="adidev-card p-4 shadow-sm h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                <h5 class="fw-bold text-dark m-0"><i class="bi bi-calendar3 text-accent me-2"></i>Upcoming Consultations</h5>
+                <a asp-controller="Appointments" asp-action="Index" class="btn btn-sm btn-outline-primary py-0">View All</a>
+            </div>
+
+            @if (!Model.UpcomingAppointments.Any())
+            {
+                <div class="text-center py-5 text-muted small">
+                    No upcoming confirmed visits in the schedule.
+                </div>
+            }
+            else
+            {
+                <div class="d-flex flex-column gap-3">
+                    @foreach (var up in Model.UpcomingAppointments)
+                    {
+                        <div class="p-3 bg-light rounded-3 border d-flex align-items-center justify-content-between">
+                            <div>
+                                <div class="fw-bold text-dark">@up.Patient.DisplayName</div>
+                                <div class="small text-primary"><i class="bi bi-calendar-event me-1"></i>@up.StartsAt.ToString("ddd, dd MMM yyyy &bull; hh:mm tt")</div>
+                                <small class="text-muted">Reason: @up.Reason</small>
+                            </div>
+                            <a asp-controller="Appointments" asp-action="Details" asp-route-id="@up.Id" class="btn btn-sm btn-outline-secondary">
+                                Details
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,97 @@
+@model List<CsharpProject.Models.MedicalRecord>
+@{
+    ViewData["Title"] = "Medical Records & Prescriptions";
+    string? searchTerm = ViewBag.SearchTerm;
+}
+
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
+    <div>
+        <h3 class="fw-bold text-dark m-0">Medical Records &amp; Clinical History</h3>
+        <p class="text-muted small m-0">Confidential consultation records, clinical diagnoses, vital signs, and prescriptions</p>
+    </div>
+</div>
+
+<!-- Search Bar -->
+<div class="adidev-card p-3 mb-4 shadow-sm">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-md-10">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="search" class="form-control border-start-0" placeholder="Search by diagnosis, patient name, or medication..." value="@searchTerm" />
+            </div>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100 fw-semibold">Search</button>
+        </div>
+    </form>
+</div>
+
+<!-- Records List -->
+<div class="row g-4">
+    @if (!Model.Any())
+    {
+        <div class="col-12 text-center py-5">
+            <div class="stat-icon stat-icon-primary mx-auto mb-3">
+                <i class="bi bi-file-earmark-medical"></i>
+            </div>
+            <h5 class="fw-bold text-dark">No medical records found</h5>
+            <p class="text-muted small">Clinical consultation records and prescriptions will appear here once consultations are completed.</p>
+        </div>
+    }
+    @foreach (var rec in Model)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="adidev-card p-4 h-100 d-flex flex-column shadow-sm">
+                <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
+                    <span class="badge bg-primary bg-opacity-10 text-primary">RECORD #@rec.Id</span>
+                    <small class="text-muted">@rec.CreatedAtUtc.ToString("dd MMM yyyy")</small>
+                </div>
+
+                <h5 class="fw-bold text-dark mb-1">@rec.Diagnosis</h5>
+                <small class="text-muted mb-3 d-block">
+                    Patient: <strong>@(rec.Patient?.DisplayName ?? rec.Appointment.Patient.DisplayName)</strong>
+                    &bull; Dr. @(rec.Doctor?.User?.DisplayName ?? rec.Appointment.Doctor.User.DisplayName)
+                </small>
+
+                @if (!string.IsNullOrEmpty(rec.BloodPressure) || !string.IsNullOrEmpty(rec.HeartRate))
+                {
+                    <div class="vitals-bar mb-3 small d-flex flex-wrap gap-2 justify-content-between">
+                        <span><strong>BP:</strong> @(rec.BloodPressure ?? "-")</span>
+                        <span><strong>HR:</strong> @(rec.HeartRate ?? "-")</span>
+                        <span><strong>SpO2:</strong> @(rec.SpO2 ?? "-")</span>
+                    </div>
+                }
+
+                <div class="p-3 bg-light rounded-3 mb-3 small flex-grow-1">
+                    <div class="fw-bold text-dark mb-1"><i class="bi bi-capsule text-success me-1"></i>Prescribed Medicines:</div>
+                    @if (rec.Prescriptions.Any())
+                    {
+                        <ul class="mb-0 ps-3">
+                            @foreach (var med in rec.Prescriptions.Take(2))
+                            {
+                                <li>@med.Medication (@med.Dosage)</li>
+                            }
+                            @if (rec.Prescriptions.Count > 2)
+                            {
+                                <li class="text-muted">+@(rec.Prescriptions.Count - 2) more medicines</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No medicines prescribed</span>
+                    }
+                </div>
+
+                <div class="d-flex gap-2 mt-auto">
+                    <a asp-action="Details" asp-route-id="@rec.Id" class="btn btn-sm btn-outline-primary flex-fill">
+                        View Details
+                    </a>
+                    <a asp-action="Print" asp-route-id="@rec.Id" target="_blank" class="btn btn-sm btn-outline-secondary flex-fill">
+                        <i class="bi bi-printer me-1"></i> Print Rx
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

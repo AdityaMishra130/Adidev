@@ -1,0 +1,181 @@
+@using CsharpProject.Models
+@{
+    ViewData["Title"] = "Adidev Healthcare Portal - Smart Hospital Management";
+    var featuredDepartments = ViewBag.FeaturedDepartments as List<Department> ?? new();
+    var featuredDoctors = ViewBag.FeaturedDoctors as List<Doctor> ?? new();
+}
+
+<!-- Hero Section -->
+<div class="hero-banner mb-5 shadow-sm">
+    <div class="row align-items-center">
+        <div class="col-lg-7">
+            <span class="badge bg-white text-primary fw-bold px-3 py-2 mb-3 rounded-pill text-uppercase" style="letter-spacing: 0.05em;">
+                <i class="bi bi-award-fill me-1"></i> SIH 2026 MedTech Innovation
+            </span>
+            <h1 class="display-5 fw-bold mb-3 text-white">Next-Gen Patient Care &amp; Hospital Management</h1>
+            <p class="lead mb-4 text-white-50" style="font-size: 1.15rem;">
+                Experience seamless appointment scheduling, digital medical health records, electronic prescriptions, and multidisciplinary specialist care on a secure, cloud-enabled health platform.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                <a class="btn btn-light btn-lg px-4 fw-bold text-primary shadow" asp-controller="Account" asp-action="Register">
+                    <i class="bi bi-person-plus-fill me-2"></i> Register as Patient
+                </a>
+                <a class="btn btn-outline-light btn-lg px-4 fw-bold" asp-controller="Doctors" asp-action="Index">
+                    <i class="bi bi-search me-2"></i> Find a Doctor
+                </a>
+                <a class="btn btn-link text-white text-decoration-none d-flex align-items-center" asp-controller="Account" asp-action="Login">
+                    Staff Portal Login <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-5 d-none d-lg-block text-center">
+            <div class="p-4 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-25 shadow-lg backdrop-blur">
+                <i class="bi bi-hospital fs-1 text-white mb-2 d-block"></i>
+                <h4 class="fw-bold text-white mb-3">Instant Quick Access</h4>
+                <div class="d-grid gap-2 text-start">
+                    <div class="p-3 bg-white rounded-3 shadow-sm text-dark d-flex align-items-center gap-3">
+                        <i class="bi bi-calendar2-check-fill fs-3 text-primary"></i>
+                        <div>
+                            <div class="fw-bold">Dynamic Time Slots</div>
+                            <small class="text-muted">Zero waiting time with live doctor schedule</small>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-white rounded-3 shadow-sm text-dark d-flex align-items-center gap-3">
+                        <i class="bi bi-file-earmark-medical-fill fs-3 text-success"></i>
+                        <div>
+                            <div class="fw-bold">Digital Rx &amp; Reports</div>
+                            <small class="text-muted">Download &amp; print clinical prescriptions</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Key Metric Highlights -->
+<div class="row g-4 mb-5">
+    <div class="col-sm-6 col-lg-3">
+        <div class="stat-widget stat-widget-primary">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number">@(ViewBag.DoctorCount ?? 0)</div>
+                    <div class="stat-label">Verified Specialists</div>
+                </div>
+                <div class="stat-icon stat-icon-primary">
+                    <i class="bi bi-person-badge-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="stat-widget stat-widget-accent">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number">@(ViewBag.DepartmentCount ?? 0)</div>
+                    <div class="stat-label">Medical Centers</div>
+                </div>
+                <div class="stat-icon stat-icon-accent">
+                    <i class="bi bi-hospital-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="stat-widget stat-widget-success">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number">@(ViewBag.AppointmentCount ?? 0)+</div>
+                    <div class="stat-label">Consultations Done</div>
+                </div>
+                <div class="stat-icon stat-icon-success">
+                    <i class="bi bi-check2-circle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="stat-widget stat-widget-warning">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Emergency Response</div>
+                </div>
+                <div class="stat-icon stat-icon-warning">
+                    <i class="bi bi-ambulance"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Departments Showcase -->
+<div class="mb-5">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h3 class="fw-bold text-dark m-0">Specialized Medical Departments</h3>
+            <p class="text-muted small m-0">Leading clinical care with board-certified healthcare professionals</p>
+        </div>
+        <a asp-controller="Doctors" asp-action="Index" class="btn btn-outline-primary btn-sm">
+            View All Doctors <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var dept in featuredDepartments)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="adidev-card adidev-card-hover p-4 h-100 d-flex flex-column">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="stat-icon stat-icon-primary">
+                            <i class="bi @dept.Icon"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold m-0 text-dark">@dept.Name</h5>
+                            <small class="text-muted">Specialty Clinic</small>
+                        </div>
+                    </div>
+                    <p class="text-secondary small mb-4 flex-grow-1">@dept.Description</p>
+                    <a asp-controller="Doctors" asp-action="Index" asp-route-departmentId="@dept.Id" class="btn btn-sm btn-outline-secondary w-100">
+                        View Doctors in @dept.Name
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Top Doctors Section -->
+<div class="mb-5">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h3 class="fw-bold text-dark m-0">Consult with Top Specialists</h3>
+            <p class="text-muted small m-0">Book online consultations or in-person hospital visits</p>
+        </div>
+        <a asp-controller="Doctors" asp-action="Index" class="btn btn-outline-primary btn-sm">
+            Browse All Specialists <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var doc in featuredDoctors)
+        {
+            <div class="col-md-6 col-lg-3">
+                <div class="adidev-card adidev-card-hover p-4 h-100 text-center d-flex flex-column">
+                    <div class="avatar-badge mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.5rem;">
+                        @doc.User.DisplayName.Substring(doc.User.DisplayName.IndexOf(" ") + 1 > 0 ? doc.User.DisplayName.IndexOf(" ") + 1 : 0, 1)
+                    </div>
+                    <h6 class="fw-bold text-dark mb-1">@doc.User.DisplayName</h6>
+                    <span class="badge bg-light text-primary mb-2 align-self-center">@(doc.Department?.Name ?? doc.Specialty)</span>
+                    <small class="text-muted mb-2 d-block">@doc.Qualification</small>
+                    <div class="text-success fw-bold small mb-3">Consultation Fee: ₹@doc.ConsultationFee.ToString("0")</div>
+                    <div class="mt-auto">
+                        <a asp-controller="Appointments" asp-action="Create" asp-route-doctorId="@doc.Id" class="btn btn-primary btn-sm w-100 shadow-sm">
+                            <i class="bi bi-calendar-plus me-1"></i> Book Slot
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

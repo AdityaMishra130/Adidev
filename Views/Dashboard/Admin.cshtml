@@ -1,0 +1,295 @@
+@model CsharpProject.Models.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Hospital Admin Dashboard";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h3 class="fw-bold text-dark m-0">Hospital Operations &amp; Administration</h3>
+        <p class="text-muted small m-0">Real-time statistics, appointment throughput, department overview, and staff management</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Doctors" asp-action="Create" class="btn btn-primary btn-sm shadow-sm">
+            <i class="bi bi-person-plus me-1"></i> Add Doctor
+        </a>
+        <a asp-controller="Departments" asp-action="Create" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-building-add me-1"></i> Add Department
+        </a>
+    </div>
+</div>
+
+<!-- KPI Metric Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-widget stat-widget-primary">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number">@Model.TotalPatients</div>
+                    <div class="stat-label">Total Patients</div>
+                </div>
+                <div class="stat-icon stat-icon-primary">
+                    <i class="bi bi-person-heart"></i>
+                </div>
+            </div>
+            <div class="mt-2 text-muted small"><i class="bi bi-check-circle text-success me-1"></i>Active registered patients</div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-widget stat-widget-accent">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number">@Model.TotalDoctors</div>
+                    <div class="stat-label">Active Doctors</div>
+                </div>
+                <div class="stat-icon stat-icon-accent">
+                    <i class="bi bi-stethoscope"></i>
+                </div>
+            </div>
+            <div class="mt-2 text-muted small"><i class="bi bi-hospital text-info me-1"></i>Across @Model.TotalDepartments departments</div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-widget stat-widget-warning">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number">@Model.PendingAppointments</div>
+                    <div class="stat-label">Pending Approval</div>
+                </div>
+                <div class="stat-icon stat-icon-warning">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+            </div>
+            <div class="mt-2 text-muted small"><i class="bi bi-clock-history text-warning me-1"></i>Awaiting clinician confirmation</div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-widget stat-widget-success">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-number">@Model.CompletedAppointments</div>
+                    <div class="stat-label">Completed Consults</div>
+                </div>
+                <div class="stat-icon stat-icon-success">
+                    <i class="bi bi-clipboard2-check"></i>
+                </div>
+            </div>
+            <div class="mt-2 text-muted small"><i class="bi bi-file-earmark-medical text-success me-1"></i>@Model.TotalMedicalRecords digital records logged</div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts & Analytics Row -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-8">
+        <div class="adidev-card p-4 h-100 shadow-sm">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold text-dark m-0"><i class="bi bi-bar-chart-fill text-primary me-2"></i>Department Distribution &amp; Doctor Strength</h5>
+                <span class="badge bg-light text-secondary border">Live Capacity</span>
+            </div>
+            <div style="height: 280px; position: relative;">
+                <canvas id="deptChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="adidev-card p-4 h-100 shadow-sm">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold text-dark m-0"><i class="bi bi-pie-chart-fill text-info me-2"></i>Appointment Statuses</h5>
+                <span class="badge bg-light text-secondary border">Total: @Model.TotalAppointments</span>
+            </div>
+            <div style="height: 280px; position: relative;">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Appointments & Staff Quick Links -->
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="adidev-card shadow-sm overflow-hidden">
+            <div class="p-3 bg-white border-bottom d-flex align-items-center justify-content-between">
+                <h6 class="fw-bold text-dark m-0"><i class="bi bi-calendar2-range text-primary me-2"></i>Recent Appointment Bookings</h6>
+                <a asp-controller="Appointments" asp-action="Index" class="btn btn-sm btn-outline-primary py-0">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="adidev-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Doctor &amp; Dept</th>
+                            <th>Date &amp; Time</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.RecentAppointments.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted small">No appointments booked yet.</td>
+                            </tr>
+                        }
+                        @foreach (var apt in Model.RecentAppointments)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-dark">@apt.Patient.DisplayName</div>
+                                    <small class="text-muted">ID: #@apt.Id</small>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">Dr. @apt.Doctor.User.DisplayName</div>
+                                    <small class="text-muted">@apt.Doctor.Specialty</small>
+                                </td>
+                                <td>
+                                    <div>@apt.StartsAt.ToString("dd MMM yyyy")</div>
+                                    <small class="text-muted">@apt.StartsAt.ToString("h:mm tt")</small>
+                                </td>
+                                <td>
+                                    @switch (apt.Status)
+                                    {
+                                        case AppointmentStatus.Pending:
+                                            <span class="status-badge status-pending"><i class="bi bi-hourglass-split"></i> Pending</span>
+                                            break;
+                                        case AppointmentStatus.Confirmed:
+                                            <span class="status-badge status-confirmed"><i class="bi bi-check2-circle"></i> Confirmed</span>
+                                            break;
+                                        case AppointmentStatus.Completed:
+                                            <span class="status-badge status-completed"><i class="bi bi-check-all"></i> Completed</span>
+                                            break;
+                                        case AppointmentStatus.Cancelled:
+                                            <span class="status-badge status-cancelled"><i class="bi bi-x-circle"></i> Cancelled</span>
+                                            break;
+                                        case AppointmentStatus.Rejected:
+                                            <span class="status-badge status-rejected"><i class="bi bi-slash-circle"></i> Rejected</span>
+                                            break;
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <a asp-controller="Appointments" asp-action="Details" asp-route-id="@apt.Id" class="btn btn-sm btn-light border">
+                                        Details
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="adidev-card p-4 shadow-sm mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                <h6 class="fw-bold text-dark m-0"><i class="bi bi-person-badge text-accent me-2"></i>Active Doctors</h6>
+                <a asp-controller="Doctors" asp-action="Manage" class="btn btn-sm btn-outline-secondary py-0">Manage</a>
+            </div>
+            <div class="d-flex flex-column gap-3">
+                @foreach (var doc in Model.Doctors)
+                {
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="avatar-badge" style="width: 34px; height: 34px; font-size: 0.85rem;">
+                                @doc.User.DisplayName.Substring(0, 1).ToUpperInvariant()
+                            </span>
+                            <div>
+                                <div class="fw-semibold small text-dark">@doc.User.DisplayName</div>
+                                <small class="text-muted">@(doc.Department?.Name ?? doc.Specialty) &bull; Room @doc.RoomNumber</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-success bg-opacity-10 text-success small">Active</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="adidev-card p-4 shadow-sm">
+            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                <h6 class="fw-bold text-dark m-0"><i class="bi bi-people text-primary me-2"></i>Recent Patients</h6>
+                <a asp-controller="Account" asp-action="Patients" class="btn btn-sm btn-outline-secondary py-0">Directory</a>
+            </div>
+            <div class="d-flex flex-column gap-2">
+                @foreach (var pt in Model.RecentPatients)
+                {
+                    <div class="d-flex align-items-center justify-content-between py-1">
+                        <div>
+                            <div class="fw-semibold small text-dark">@pt.DisplayName</div>
+                            <small class="text-muted">@pt.Email</small>
+                        </div>
+                        @if (!string.IsNullOrEmpty(pt.BloodGroup))
+                        {
+                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 small">@pt.BloodGroup</span>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Department Bar Chart
+            var deptLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DepartmentStats.Select(d => d.DepartmentName)));
+            var deptDoctors = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DepartmentStats.Select(d => d.DoctorCount)));
+            var deptAppointments = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DepartmentStats.Select(d => d.AppointmentCount)));
+
+            new Chart(document.getElementById('deptChart'), {
+                type: 'bar',
+                data: {
+                    labels: deptLabels,
+                    datasets: [
+                        {
+                            label: 'Doctors',
+                            data: deptDoctors,
+                            backgroundColor: '#0284c7',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Appointments',
+                            data: deptAppointments,
+                            backgroundColor: '#06b6d4',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    }
+                }
+            });
+
+            // Status Doughnut Chart
+            new Chart(document.getElementById('statusChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pending', 'Confirmed', 'Completed', 'Cancelled'],
+                    datasets: [{
+                        data: [@Model.PendingAppointments, @Model.ConfirmedAppointments, @Model.CompletedAppointments, @Model.CancelledAppointments],
+                        backgroundColor: ['#f59e0b', '#0284c7', '#10b981', '#94a3b8'],
+                        borderWidth: 2,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,177 @@
+@model List<CsharpProject.Models.Appointment>
+@{
+    ViewData["Title"] = "Appointments Management";
+    int? selectedStatus = ViewBag.SelectedStatus;
+    int? selectedDoc = ViewBag.SelectedDoctorId;
+    string? searchTerm = ViewBag.SearchTerm;
+}
+
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
+    <div>
+        <h3 class="fw-bold text-dark m-0">Appointments &amp; Consultations</h3>
+        <p class="text-muted small m-0">Monitor consultation bookings, approval states, and patient history</p>
+    </div>
+    @if (User.IsInRole(CsharpProject.Models.PortalRoles.Patient))
+    {
+        <a asp-action="Create" class="btn btn-primary btn-sm shadow-sm">
+            <i class="bi bi-calendar-plus me-1"></i> Book New Appointment
+        </a>
+    }
+</div>
+
+<!-- Filters Bar -->
+<div class="adidev-card p-3 mb-4 shadow-sm">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="search" class="form-control border-start-0" placeholder="Search by patient, doctor or reason..." value="@searchTerm" />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select name="status" class="form-select">
+                <option value="">All Statuses</option>
+                <option value="0" selected="@(selectedStatus == 0)">Pending</option>
+                <option value="1" selected="@(selectedStatus == 1)">Confirmed</option>
+                <option value="4" selected="@(selectedStatus == 4)">Completed</option>
+                <option value="3" selected="@(selectedStatus == 3)">Cancelled</option>
+                <option value="2" selected="@(selectedStatus == 2)">Rejected</option>
+            </select>
+        </div>
+        @if (User.IsInRole(CsharpProject.Models.PortalRoles.Admin))
+        {
+            <div class="col-md-3">
+                <select name="doctorId" class="form-select">
+                    <option value="">All Doctors</option>
+                    @foreach (var d in (IEnumerable<dynamic>)ViewBag.Doctors)
+                    {
+                        <option value="@d.Id" selected="@(selectedDoc == d.Id)">@d.Name</option>
+                    }
+                </select>
+            </div>
+        }
+        <div class="@(User.IsInRole(CsharpProject.Models.PortalRoles.Admin) ? "col-md-2" : "col-md-5")">
+            <button type="submit" class="btn btn-primary w-100 fw-semibold">Filter</button>
+        </div>
+    </form>
+</div>
+
+<!-- Appointments Table -->
+<div class="adidev-card shadow-sm overflow-hidden">
+    <div class="table-responsive">
+        <table class="adidev-table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Appointment ID</th>
+                    <th>Date &amp; Time</th>
+                    <th>Patient</th>
+                    <th>Doctor &amp; Specialty</th>
+                    <th>Reason for Visit</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-calendar-x fs-1 d-block mb-2"></i>
+                            No appointments found matching your criteria.
+                        </td>
+                    </tr>
+                }
+                @foreach (var apt in Model)
+                {
+                    <tr>
+                        <td class="fw-bold text-muted">
+                            #@apt.Id
+                        </td>
+                        <td>
+                            <div class="fw-bold text-dark">@apt.StartsAt.ToString("ddd, dd MMM yyyy")</div>
+                            <small class="text-primary fw-semibold"><i class="bi bi-clock me-1"></i>@apt.StartsAt.ToString("hh:mm tt")</small>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-dark">@apt.Patient.DisplayName</div>
+                            <small class="text-muted"><i class="bi bi-telephone me-1"></i>@(apt.Patient.PhoneNumber ?? "N/A")</small>
+                        </td>
+                        <td>
+                            <div class="fw-semibold text-dark">Dr. @apt.Doctor.User.DisplayName</div>
+                            <small class="text-muted">@(apt.Doctor.Department?.Name ?? apt.Doctor.Specialty) &bull; Room @apt.Doctor.RoomNumber</small>
+                        </td>
+                        <td>
+                            <span class="small text-secondary d-inline-block text-truncate" style="max-width: 220px;" title="@apt.Reason">
+                                @apt.Reason
+                            </span>
+                        </td>
+                        <td>
+                            @switch (apt.Status)
+                            {
+                                case AppointmentStatus.Pending:
+                                    <span class="status-badge status-pending"><i class="bi bi-hourglass-split"></i> Pending</span>
+                                    break;
+                                case AppointmentStatus.Confirmed:
+                                    <span class="status-badge status-confirmed"><i class="bi bi-check2-circle"></i> Confirmed</span>
+                                    break;
+                                case AppointmentStatus.Completed:
+                                    <span class="status-badge status-completed"><i class="bi bi-check-all"></i> Completed</span>
+                                    break;
+                                case AppointmentStatus.Cancelled:
+                                    <span class="status-badge status-cancelled"><i class="bi bi-x-circle"></i> Cancelled</span>
+                                    break;
+                                case AppointmentStatus.Rejected:
+                                    <span class="status-badge status-rejected"><i class="bi bi-slash-circle"></i> Rejected</span>
+                                    break;
+                            }
+                        </td>
+                        <td class="text-end">
+                            <div class="d-inline-flex gap-1 align-items-center">
+                                <a asp-action="Details" asp-route-id="@apt.Id" class="btn btn-sm btn-light border py-1" title="View Details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+
+                                <!-- Doctor confirmation / rejection -->
+                                @if ((User.IsInRole(PortalRoles.Doctor) || User.IsInRole(PortalRoles.Admin)) && apt.Status == AppointmentStatus.Pending)
+                                {
+                                    <form asp-action="Confirm" asp-route-id="@apt.Id" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-success py-1" title="Confirm Appointment">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                    </form>
+                                }
+
+                                <!-- Doctor completion -->
+                                @if (User.IsInRole(PortalRoles.Doctor) && (apt.Status == AppointmentStatus.Confirmed || apt.Status == AppointmentStatus.Pending))
+                                {
+                                    <form asp-action="Complete" asp-route-id="@apt.Id" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-primary py-1" title="Mark Visited & Prescribe">
+                                            <i class="bi bi-clipboard2-pulse"></i>
+                                        </button>
+                                    </form>
+                                }
+
+                                <!-- View prescription if completed -->
+                                @if (apt.Status == AppointmentStatus.Completed && apt.MedicalRecord != null)
+                                {
+                                    <a asp-controller="Records" asp-action="Print" asp-route-id="@apt.MedicalRecord.Id" target="_blank" class="btn btn-sm btn-outline-secondary py-1" title="Print Prescription">
+                                        <i class="bi bi-printer"></i>
+                                    </a>
+                                }
+
+                                <!-- Cancellation by Patient or Admin -->
+                                @if (apt.Status != AppointmentStatus.Completed && apt.Status != AppointmentStatus.Cancelled && apt.Status != AppointmentStatus.Rejected)
+                                {
+                                    <form asp-action="Cancel" asp-route-id="@apt.Id" method="post" class="d-inline" onsubmit="return confirm('Cancel this appointment?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger py-1" title="Cancel Appointment">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
